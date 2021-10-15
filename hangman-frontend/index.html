@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Hangman Versus</title>
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1">
+    <link href="main.css" rel="stylesheet" type="text/css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+  </head>
+
+  <body>
+    <div id="page-container">
+      <div id="content-wrap">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-md-12 text-center">
+              <h1>Hangman Versus</h1>
+            </div>
+          </div>
+          <hr>
+        </div>
+
+        <div class="container" id="container-loading">
+          <div class="row">
+            <div class="col-md-12 text-center">
+              <h3>Loading...</h3>
+            </div>
+          </div>
+        </div>
+        <div class="container" id="container-home" style="display: none">
+          <div class="row">
+            <div class="col-md-12 text-center">
+              Create, or join an existing game!
+            </div>
+          </div>
+          <hr>
+          <div class="row">
+            <div class="col-sm-12 text-center">
+              <label for="playerName">Player name: </label> <input id="playerName" type="text" value="Player">
+            </div>
+          </div>
+          <hr>
+          <div class="row">
+            <div class="col-sm-12 text-center">
+              <button type="button" id="createBtn" class="btn btn-info btn-sm">Create game</button>
+            </div>
+          </div>
+          <hr>
+          <div class="row">
+            <div class="col-sm-12 text-center">
+              <label for="joinGameToken">Join game with code</label> <input id="joinGameToken" type="text">
+              <button type="button" id="joinBtn" class="btn btn-info btn-sm">Join game</button>
+            </div>
+          </div>
+          <hr>
+        </div>
+
+        <div class="container" id="container-game" style="display: none">
+          <div class="row" id="role-info">
+            <div class="col-md-10 text-center"></div>
+            <div class="col-md-2 text-center">
+              <button id="showRoleInfo" class="btn btn-info">Role info</button>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12 text-center">
+              <h2>Game code: </h2>
+              <h2 id="gameCode"></h2>
+            </div>
+          </div>
+          <hr>
+          <div class="row" id="row-player-list">
+            <button id="show-player-list" data-bs-toggle="collapse" data-bs-target="#playerListWrapper" aria-controls="playerListWrapper" class="btn btn-outline-primary">Toggle playerlist</button>
+            <div class="collapse show" id="playerListWrapper">
+              <table id="playerListForHost" style="display: none" class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>
+                      Players
+                    </th>
+                    <th>
+                      Narrator?
+                    </th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="player-list-body-host">
+                </tbody>
+              </table>
+              <table id="playerListForPlayers" class="table">
+                <thead>
+                <tr>
+                  <th>
+                    Players
+                  </th>
+                  <th>
+                    Role
+                  </th>
+                  <th>
+                    Alive
+                  </th>
+                </tr>
+                </thead>
+                <tbody id="player-list-body-player">
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="row text-center" id="row-player-startstop">
+            <div class="col-md-1"></div>
+            <div class="col-md-10">
+              <button id="disconnect" class="btn btn-danger">Disconnect</button>
+              <button id="start" class="btn btn-success" style="display: none">Start game</button>
+            </div>
+            <div class="col-md-1"></div>
+          </div>
+          <hr>
+          <div class="row" id="row-substate" style="display: none">
+            <div class="col-md-3"></div>
+            <div class="col-md-6 text-center">
+              <h2 id="subState"></h2>
+            </div>
+            <div class="col-md-3"></div>
+            <hr>
+          </div>
+          <div id="row-win" style="display: none">
+            <div class="row">
+              <div class="col-md-3"></div>
+              <div class="col-md-6 text-center">
+                <h2>Winners: </h2><h2 id="winningRole"></h2>
+              </div>
+              <div class="col-md-3"></div>
+              <hr>
+            </div>
+            <div class="row">
+              <div class="col-md-3"></div>
+              <div class="col-md-6 text-center">
+                <button class="btn btn-danger" id="disconnectWin">Disconnect</button>
+              </div>
+              <div class="col-md-3"></div>
+              <hr>
+            </div>
+          </div>
+
+          <div class="row" id="row-night-role-selection" style="display: none">
+            <div class="col-md-1"></div>
+            <div class="col-md-10 text-center">
+              <table class="table">
+                <tbody id="rolesToPerform">
+                <tr>
+                  <td>
+                    <button id="werewolves-night" class="btn btn-outline-danger">Wolves</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <button id="medium-night" class="btn btn-outline-warning">Medium</button>
+                  </td>
+                </tr>
+                <tr id="playersKilledRow">
+                  <td>
+                    <span>Players killed in this night: </span><span id="playersKilled"></span>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <button id="finishNight" style="display: none" class="btn btn-outline-primary">Finish night</button>
+                  </td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="col-md-1"></div>
+          </div>
+
+          <div class="row text-center" id="row-night-medium" style="display: none">
+            <div id="medium-pre-select">
+              <div class="col-md-2"></div>
+              <div class="col-md-8">
+                <label for="medium-selection">Of which player do you want to see the role? </label><select id="medium-selection"> </select><button class="btn btn-info" id="medium-submit">Submit</button>
+              </div>
+              <div class="col-md-2"></div>
+            </div>
+            <div id="medium-post-select" style="display: none">
+              <div class="col-md-2"></div>
+              <div class="col-md-8">
+                <label for="medium-player-name"></label><span id="medium-player-name"></span><span> is a </span><span id="medium-player-role"></span>
+              </div>
+              <div class="col-md-2"></div>
+            </div>
+          </div>
+          <!-- Game row: Voting results table -->
+          <div id="row-vote-results" style="display: none">
+            <div class="row">
+              <table class="table table-striped">
+                <thead>
+                <tr>
+                  <th>Player</th>
+                  <th>Voted on</th>
+                </tr>
+                </thead>
+                <tbody id="vote-result-table-content">
+
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <!-- Player row: Voting process -->
+          <div id="row-vote-players" style="display: none">
+            <div class="row text-center">
+              <div class="col-md-3"></div>
+              <div class="col-md-6">
+                <label for="vote-list">Who are you voting on? </label><select id="vote-list"></select>
+              </div>
+              <div class="col-md-3"></div>
+            </div>
+            <div class="row">
+              <div class="col-md-2"></div>
+              <div class="col-md-8">
+                <button class="btn btn-outline-primary btn-block" id="vote-lock">Lock vote</button>
+              </div>
+              <div class="col-md-2"></div>
+            </div>
+          </div>
+          <!-- Narrator row: Voting process -->
+          <div id="row-vote-narrator" style="display: none">
+            <div class="row text-center">
+              <div class="col-md-12">
+                <span>Vote result: </span><span id="vote-result-narrator"></span>
+              </div>
+            </div>
+            <div class="row text-center">
+              <div class="col-md-12">
+                <span>Players that still have to vote: </span><span id="players-that-have-to-vote"></span>
+              </div>
+            </div>
+            <div class="row text-center">
+              <div class="col-md-12">
+                <button class="btn btn-primary" id="vote-reset" style="display: none">Reset vote</button>
+                <button class="btn btn-primary" id="vote-finish" style="display: none">Finish vote</button>
+              </div>
+            </div>
+          </div>
+          <!-- Narrator row: Start night -->
+          <div class="row text-center" id="row-startNight" style="display: none">
+            <div class="col-md-3"></div>
+            <div class="col-md-6">
+              <button class="btn btn-outline-primary" id="startNight">Start night</button>
+            </div>
+            <div class="col-md-3"></div>
+          </div>
+          </div>
+      </div>
+        <footer id="footer">
+          <div class="container">
+            <div class="row">
+              <div class="col-sm-12 text-center font-small">
+                <i><a href="http://www.jvpoppel.com" target="_blank">©Johan van Poppel 2021</a></i>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-12 text-center font-small">
+                <i><a href="https://github.com/jvpoppel/werewolves" target="_blank">Check my
+                  GitHub for
+                  development builds!</a></i>
+              </div>
+            </div>
+          </div>
+        </footer>
+      </div>
+
+    <!-- Modal: Role Information -->
+    <div id="roleModal" class="modal fade" role="dialog">
+      <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">Role information</h4>
+            <button type="button" class="close btn btn-default" data-bs-dismiss="modal">&times;</button>
+          </div>
+
+          <div class="modal-body">
+            <table class="table">
+              <thead>
+              <tr>
+                <th>
+                  Role
+                </th>
+                <th>
+                  Description
+                </th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr>
+                <td><span id="roleName"></span></td>
+                <td><span id="roleInformation"></span></td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- JQuery, Bootstrap and jshue libraries incl. dependencies -->
+    <script src="http://code.jquery.com/jquery-3.3.1.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4"
+            crossorigin="anonymous"></script>
+
+    <!-- Own scripts -->
+    <script src="./bundle.js" type="text/javascript"></script>
+  </body>
+
+</html>

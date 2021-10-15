@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "outDir": "./build-tsc",
+    "allowJs": true,
+    "target": "es5",
+    "lib": [
+      "dom",
+      "es5",
+      "scripthost",
+      "es2015.promise"
+    ]
+  },
+  "include": [
+    "./src"
+  ]
+}

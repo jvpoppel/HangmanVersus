@@ -1,0 +1,35 @@
+{
+  "name": "wolves-frontend",
+  "version": "1.0.0",
+  "description": "Frontend for HangmanVersus",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "copy-index": "shx cp ./index.html ./dist/hangman-frontend",
+    "copy-style": "shx cp ./styles/main.css ./dist/hangman-frontend",
+    "clean": "npm run clean-build-steps && rm -rf dist",
+    "tsc": "tsc",
+    "webpack": "webpack",
+    "minify": "terser ./dist/hangman-frontend/bundle.js -o ./dist/hangman-frontend/bundle.min.js -m reserved=['$','require','exports']",
+    "clean-build-steps": "rm -rf build-tsc",
+    "build": "npm run clean && npm run tsc && npm run webpack && npm run minify && npm run clean-build-steps && npm run copy-index && npm run copy-style"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jvpoppel/HangmanVersus.git"
+  },
+  "author": "Johan van Poppel",
+  "license": "GPL-3.0-or-later",
+  "dependencies": {
+    "@types/jquery": "^3.5.5",
+    "terser": "^5.7.0",
+    "typescript": "^4.3.2",
+    "typescript-map": "^0.1.0",
+    "webpack": "^5.39.0"
+  },
+  "devDependencies": {
+    "@types/bootstrap": "^5.0.16",
+    "shx": "^0.3.3",
+    "webpack-cli": "^4.7.2"
+  }
+}
