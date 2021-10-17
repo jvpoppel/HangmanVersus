@@ -16,5 +16,6 @@ export interface GameData {
   ownGuesses?: string[],
   ownIncorrectGuesses?: number,
   opponentGuesses?: string[],
-  opponentIncorrectGuesses?: number
+  opponentIncorrectGuesses?: number,
+  opponentWord?: string[]
 }

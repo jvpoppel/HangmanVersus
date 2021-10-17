@@ -7,6 +7,7 @@ import {Player} from "./Player";
 import {Director} from "../manager/Director";
 import {GameRole} from "../model/GameRole";
 import {SubState} from "../model/SubState";
+import {FormattedOpponentWordWithGuesses} from "../questions/FormattedOpponentWordWithGuesses";
 
 export class GameData {
 
@@ -80,7 +81,8 @@ export class GameData {
       "ownGuesses": player.getGuesses(),
       "ownIncorrectGuesses": player.getIncorrectGuesses(),
       "opponentGuesses": otherPlayer.getGuesses(),
-      "opponentIncorrectGuesses": otherPlayer.getIncorrectGuesses()
+      "opponentIncorrectGuesses": otherPlayer.getIncorrectGuesses(),
+      "opponentWord": FormattedOpponentWordWithGuesses.askedBy(player.getToken()).inGame(game.getToken())
     };
 
     return {...currentData, ...playerSpecificData};

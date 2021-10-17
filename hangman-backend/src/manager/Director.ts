@@ -9,9 +9,9 @@ import {getLogger} from "../endpoint";
 import {TokenManager} from "./TokenManager";
 import {FisherYatesShuffle} from "../util/FisherYatesShuffle";
 import {GameRole} from "../model/GameRole";
-import {Token} from "../model/Token";
 import {IsGuessCorrect} from "../questions/IsGuessCorrect";
 import {DidAllPlayersChooseAWord} from "../questions/DidAllPlayersChooseAWord";
+import {SubState} from "../model/SubState";
 
 export class Director {
 
@@ -232,7 +232,13 @@ export class Director {
     if (!IsGuessCorrect.askedBy(playerToken).inGame(gameToken).guessing(guess)) {
       PlayerManager.get().getByToken(playerToken).increaseIncorrectGuesses();
     }
-    GameManager.get().getByToken(gameToken).increaseIteration();
+    const game = GameManager.get().getByToken(gameToken);
+    if (game.getSubState() === SubState.PLAYER_ONE_CHOOSING) {
+      game.setSubStateToPlayerTwo();
+    } else if (game.getSubState() === SubState.PLAYER_TWO_CHOOSING) {
+      game.setSubStateToPlayerOne();
+    }
+    game.increaseIteration();
     return true;
   }
 

@@ -87,6 +87,30 @@ export class UpdateWithGameData {
         WebElements.OWN_INCORRECT_GUESSES().innerText = "" + data.ownIncorrectGuesses;
         WebElements.GUESSES_OPPONENT_WORD().innerText = playerGuesses.toString();
         WebElements.OPPONENT_INCORRECT_GUESSES().innerText = "" + data.opponentIncorrectGuesses;
+
+        let formattedOpponentWord = "";
+        data.opponentWord.forEach(letter => {
+          if (formattedOpponentWord.length > 0) {
+            formattedOpponentWord += " ";
+          }
+          formattedOpponentWord += letter;
+        });
+        WebElements.OPPONENT_WORD().innerText = formattedOpponentWord;
+
+        // If the host is the current player && Substate is correct
+        if (data.host === LocalStorage.playerToken()) {
+          if (data.substate == SubState.PLAYER_ONE_CHOOSING) {
+            DisplayManager.SHOW_GUESS_INPUT();
+          } else {
+            DisplayManager.HIDE_GUESS_INPUT();
+          }
+        } else {
+          if (data.substate == SubState.PLAYER_TWO_CHOOSING) {
+            DisplayManager.SHOW_GUESS_INPUT();
+          } else {
+            DisplayManager.HIDE_GUESS_INPUT();
+          }
+        }
       } else {
         // We are in word selection!
         DisplayManager.SHOW_WORD_INPUT();

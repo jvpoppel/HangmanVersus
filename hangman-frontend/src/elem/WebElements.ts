@@ -42,4 +42,5 @@ export class WebElements {
   public static OWN_INCORRECT_GUESSES(): HTMLElement { return document.getElementById("ownIncorrectGuesses")}
   public static GUESSES_OPPONENT_WORD(): HTMLElement { return document.getElementById("guessesOpponentWord")}
   public static OPPONENT_INCORRECT_GUESSES(): HTMLElement { return document.getElementById("theirIncorrectGuesses")}
+  public static OPPONENT_WORD(): HTMLElement { return document.getElementById("theirWord")}
 }
