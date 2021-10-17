@@ -7,11 +7,8 @@ import {DisplayManager} from "./elem/DisplayManager";
 import {Game} from "./game/Game";
 import {DisconnectAPI} from "./api/DisconnectAPI";
 import {StartGameAPI} from "./api/StartGameAPI";
-import {NightApi} from "./api/NightApi";
-import {ResetVoteApi} from "./api/ResetVoteApi";
-import {FinishVoteApi} from "./api/FinishVoteApi";
-import {VoteOnPlayerApi} from "./api/VoteOnPlayerApi";
-import {MediumApi} from "./api/MediumApi";
+import {SubmitWordAPI} from "./api/SubmitWordAPI";
+import {GuessAPI} from "./api/GuessAPI";
 
 $(() => {
   new Main();
@@ -75,25 +72,8 @@ export class Main {
   Perform API call to start a game
    */
   public async performStartGameApi(): Promise<void> {
-    let narratorToken = "";
-    WebElements.NARRATOR_RADIOBUTTONS().forEach(function(radioButton: HTMLInputElement) {
-      if (radioButton.checked) {
-        narratorToken = radioButton.id.split("-")[0];
-      }
-    });
-    if (narratorToken === "") {
-      window.alert("Could not start game: Please choose a narrator");
-      return;
-    }
-    await StartGameAPI.send(LocalStorage.gameToken(), LocalStorage.playerToken(), LocalStorage.uuid(), narratorToken);
-  }
 
-  public async performNightApi(action: string): Promise<void> {
-    await NightApi.send(LocalStorage.gameToken(), LocalStorage.playerToken(), LocalStorage.uuid(), action).then(status => {
-      if (status !== "success") {
-        console.log("Could not perform selected Night action!");
-      }
-    });
+    await StartGameAPI.send(LocalStorage.gameToken(), LocalStorage.playerToken(), LocalStorage.uuid());
   }
 
   public async performDisconnectFromGameApi(): Promise<void> {
@@ -105,37 +85,22 @@ export class Main {
     });
   }
 
-  public async performResetVoteApi(): Promise<void> {
-    await ResetVoteApi.send(LocalStorage.gameToken(), LocalStorage.playerToken(), LocalStorage.uuid()).then(response => {
-      if (response.status !== "success") {
-        console.warn("Could not reset vote: " + response);
-        window.alert("Could not reset vote");
+  public async performSubmitWordApi(): Promise<void> {
+    const chosenWord: string = (<HTMLInputElement> WebElements.WORD_INPUT()).value;
+    await SubmitWordAPI.send(LocalStorage.gameToken(), LocalStorage.playerToken(), LocalStorage.uuid(), chosenWord).then(response => {
+      if (response.status === "success") {
+        DisplayManager.HIDE_WORD_INPUT();
       }
     });
   }
 
-  public async performFinishVoteApi(): Promise<void> {
-    await FinishVoteApi.send(LocalStorage.gameToken(), LocalStorage.playerToken(), LocalStorage.uuid()).then(response => {
-      if (response.status !== "success") {
-        console.warn("Could not finish vote: " + response);
-        window.alert("Could not finish vote");
+  public async performGuessApi(): Promise<void> {
+    const guess: string = (<HTMLInputElement> WebElements.GUESS_INPUT()).value;
+    await GuessAPI.send(LocalStorage.gameToken(), LocalStorage.playerToken(), LocalStorage.uuid(), guess).then(response => {
+      if (response.status === "success") {
+        DisplayManager.HIDE_GUESS_INPUT();
       }
     });
-  }
-
-  public async performVoteOnPlayerApi(): Promise<void> {
-    await VoteOnPlayerApi.send(LocalStorage.gameToken(), LocalStorage.playerToken(), LocalStorage.uuid(),
-      (<HTMLInputElement> WebElements.VOTE_OPTIONS()).value).then(response => {
-
-      if (response.status !== "success") {
-        window.alert("Could not vote on player");
-      }
-    });
-  }
-
-  public async performMediumSubmitApi(): Promise<void> {
-    await MediumApi.send(LocalStorage.gameToken(), LocalStorage.playerToken(), LocalStorage.uuid(),
-      (<HTMLSelectElement> WebElements.MEDIUM_SELECTION()).value);
   }
 
   private setupBaseEventListeners(): void {
@@ -144,15 +109,8 @@ export class Main {
     WebElements.DISCONNECT().addEventListener("click", () => this.performDisconnectFromGameApi());
     WebElements.DISCONNECT_AFTER_WIN().addEventListener("click", () => this.performDisconnectFromGameApi());
     WebElements.START().addEventListener("click", () => this.performStartGameApi());
-    WebElements.ROLE_INFO_BUTTON().addEventListener("click", () => $("#roleModal").modal("show"));
-    WebElements.START_NIGHT().addEventListener("click", () => this.performNightApi("start"));
-    WebElements.FINISH_NIGHT().addEventListener("click", () => this.performNightApi("finish"));
-    WebElements.WOLVES_NIGHT().addEventListener("click", () => this.performNightApi("wolves"));
-    WebElements.MEDIUM_NIGHT().addEventListener("click", () => this.performNightApi("medium"));
-    WebElements.LOCK_VOTE().addEventListener("click", () => this.performVoteOnPlayerApi());
-    WebElements.RESET_VOTE().addEventListener("click", () => this.performResetVoteApi());
-    WebElements.FINISH_VOTE().addEventListener("click", () => this.performFinishVoteApi());
-    WebElements.MEDIUM_SUBMIT().addEventListener("click", () => this.performMediumSubmitApi());
+    WebElements.WORD_SUBMIT().addEventListener("click", () => this.performSubmitWordApi());
+    WebElements.GUESS_SUBMIT().addEventListener("click", () => this.performGuessApi());
   }
 
 }

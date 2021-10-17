@@ -7,11 +7,10 @@ import {getLogger} from "../endpoint";
 import {PlayerToken} from "../model/PlayerToken";
 import {Director} from "../manager/Director";
 
-export function apiStartGame(supposedHost: string, givenToken: string, narratorToken: string): string {
+export function apiStartGame(supposedHost: string, givenToken: string): string {
 
   const gameToken: Token = TokenManager.get().getFromString(givenToken);
   const playerToken: Token = TokenManager.get().getFromString(supposedHost);
-  const narrator: Token = TokenManager.get().getFromString(narratorToken);
 
   if (!(gameToken instanceof GameToken)) {
     getLogger().debug("[APIStartGame] Given token " + givenToken + " is not a game token.");
@@ -19,14 +18,6 @@ export function apiStartGame(supposedHost: string, givenToken: string, narratorT
   }
   if (!(playerToken instanceof PlayerToken)) {
     getLogger().debug("[APIStartGame] Given token " + supposedHost + " is not a player token.");
-    return "failed"; // No game on given token
-  }
-  if (!(narrator instanceof PlayerToken)) {
-    getLogger().debug("[APIStartGame] Given token " + narratorToken + " is not a player token.");
-    return "failed"; // No game on given token
-  }
-  if (!Director.get().checkIfPlayerInGame(narrator, gameToken)) {
-    getLogger().debug("[APIStartGame] Given narrator " + narratorToken + " is not in game " + givenToken);
     return "failed"; // No game on given token
   }
 
@@ -37,7 +28,7 @@ export function apiStartGame(supposedHost: string, givenToken: string, narratorT
     return "unauthorized";
   }
 
-  const gameStarted: boolean | undefined = Director.get().startGameWithNarrator(gameToken, narrator);
+  const gameStarted: boolean | undefined = Director.get().startGame(gameToken);
   if (gameStarted === undefined) {
     getLogger().debug("[APIStartGame] Game " + givenToken + " could not be started.");
     return "failed"; // Game not started, might be already in progress

@@ -8,7 +8,6 @@ import {Director} from "../manager/Director";
 import {GameRole} from "../model/GameRole";
 import {SubState} from "../model/SubState";
 
-// TODO: Change after building the new game type
 export class GameData {
 
   /**
@@ -40,7 +39,6 @@ export class GameData {
     const playerTokensInGame: string[] = playersInGameLST.map(playerToken => playerToken.getToken());
     const playerRolesInGame: string[] = playersInGameLST.map(queryToken =>
       Director.get().getRoleOfPlayerAsPlayer(PlayerManager.get().getByToken(queryToken), player));
-    const playerAliveInGame: string[] = playersInGameLST.map(playerToken => PlayerManager.get().getByToken(playerToken).isAlive() + "");
     const iteration = game.getIteration();
 
     const generalGameData: any = {
@@ -56,22 +54,35 @@ export class GameData {
       "playerTokens": playerTokensInGame,
       "playerNames": playerNamesInGame,
       "playerRoles": playerRolesInGame,
-      "playersAliveInGame": playerAliveInGame,
-      "role": player.getRole(),
-      "roleDescription": player.getRole() + " role description",
-      "alive": player.isAlive(),
       "substate": game.getSubState()
     };
-    return GameData.addPlayerSpecificData(game, player, generalGameData);
+    return GameData.addPlayerSpecificData(game, player, playersInGameLST, generalGameData);
 
     // Now; put the player-specific data in there.
   }
 
-  public static addPlayerSpecificData(game: Game, player: Player, currentData: any): any {
+  public static addPlayerSpecificData(game: Game, player: Player, playersInGame: PlayerToken[], currentData: any): any {
 
     // For now, not yet needed.
     // To be used for i.e. Player 1 to receive their own word, and the current state of Player 2.
+    if (game.playerCanJoin()) { // Word & Guess specific data is only present after game starts
+      return currentData;
+    }
 
-    return currentData;
+    let otherPlayer: Player;
+    if (playersInGame[0] === player.getToken()) {
+      otherPlayer = PlayerManager.get().getByToken(playersInGame[1]);
+    } else {
+      otherPlayer = PlayerManager.get().getByToken(playersInGame[0]);
+    }
+
+    const playerSpecificData = { "ownWord": player.getWord(),
+      "ownGuesses": player.getGuesses(),
+      "ownIncorrectGuesses": player.getIncorrectGuesses(),
+      "opponentGuesses": otherPlayer.getGuesses(),
+      "opponentIncorrectGuesses": otherPlayer.getIncorrectGuesses()
+    };
+
+    return {...currentData, ...playerSpecificData};
   }
 }

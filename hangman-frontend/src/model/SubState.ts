@@ -1,10 +1,6 @@
 export enum SubState {
-  DAYTIME_FIRST = "First day",
-  DAYTIME_VOTING = "Voting...",
-  DAYTIME_TIEDVOTE = "Vote tied!",
-  DAYTIME_POSTVOTE = "End of day",
-  NIGHTTIME_SELECTION = "Night",
-  NIGHTTIME_WOLVES = "Night - Wolves are hunting",
-  NIGHTTIME_MEDIUM = "Night - Medium is concentrating...",
+  PLAYERS_CHOOSING_WORDS = "Everyone is thinking about their words...",
+  PLAYER_ONE_CHOOSING = "Player One is thinking...",
+  PLAYER_TWO_CHOOSING = "Player Two is thinking...",
   GAME_FINISHED = "Game Finished"
 }

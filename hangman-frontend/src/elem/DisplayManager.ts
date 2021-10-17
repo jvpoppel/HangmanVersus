@@ -46,6 +46,9 @@ export class DisplayManager {
     WebElements.PLAYER_LIST_BODY_HOST().innerHTML = "";
     WebElements.PLAYER_LIST_BODY_PLAYER().innerHTML = "";
     WebElements.SUBSTATE_ROW().style.display = "none";
+    WebElements.WORD_SECTION().style.display = "none";
+    WebElements.WORD_SELECTION_SECTION().style.display = "none";
+    WebElements.GUESS_SELECTION_SECTION().style.display = "none";
   }
 
   public static HIDE_START_STOP(): void {
@@ -56,19 +59,27 @@ export class DisplayManager {
     WebElements.START().style.display = "";
   }
 
-  public static ShowNightControls(): void {
-    WebElements.NIGHT_SELECTION_ROW().style.display = "";
+  public static SHOW_WORD_SECTION(): void {
+    WebElements.WORD_SECTION().style.display = "";
   }
 
-  public static HideNightControls(): void {
-    WebElements.NIGHT_SELECTION_ROW().style.display = "none";
+  public static HIDE_WORD_SECTION(): void {
+    WebElements.WORD_SECTION().style.display = "none";
   }
 
-  public static ResetNightControls(): void {
-    WebElements.WOLVES_NIGHT().style.display = "";
-    WebElements.MEDIUM_NIGHT().style.display = "";
-    WebElements.FINISH_NIGHT().style.display = "none";
-    WebElements.PLAYERS_KILLED_ROW().style.display = "none";
-    WebElements.PLAYERS_KILLED_TEXT().innerText = "";
+  public static SHOW_WORD_INPUT(): void {
+    WebElements.WORD_SELECTION_SECTION().style.display = "";
+  }
+
+  public static HIDE_WORD_INPUT(): void {
+    WebElements.WORD_SELECTION_SECTION().style.display = "none";
+  }
+
+  public static SHOW_GUESS_INPUT(): void {
+    WebElements.GUESS_SELECTION_SECTION().style.display = "";
+  }
+
+  public static HIDE_GUESS_INPUT(): void {
+    WebElements.GUESS_SELECTION_SECTION().style.display = "none";
   }
 }

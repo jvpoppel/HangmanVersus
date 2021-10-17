@@ -11,16 +11,10 @@ export interface GameData {
   playerTokens?: string[],
   playerNames?: string[],
   playerRoles?: string[],
-  playersAliveInGame?: string[]
-  role?: string,
-  roleDescription?: string,
-  alive?: boolean,
   substate?: string,
-  voteIteration?: number,
-  rolesStillInNight?: string[],
-  playersKilledInNight?: string[],
-  playersStillNeedingToVote?: string[],
-  voteWinner?: string,
-  playerNameChecked?: string,
-  playerRoleChecked?: string
+  ownWord?: string,
+  ownGuesses?: string[],
+  ownIncorrectGuesses?: number,
+  opponentGuesses?: string[],
+  opponentIncorrectGuesses?: number
 }

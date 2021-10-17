@@ -6,7 +6,7 @@ export class StartGameAPI {
 
   private static sending: boolean;
 
-  public static async send(gameToken: string, playerToken: string, hostUuid: string, narrator: string): Promise<GameData> {
+  public static async send(gameToken: string, playerToken: string, hostUuid: string): Promise<GameData> {
     if (this.sending) {
       console.warn("StartGameAPI: Asked for new request but previous request is still sending!");
       return;
@@ -15,7 +15,7 @@ export class StartGameAPI {
 
     return await new BaseApi().put<{ status }>("{0}:{1}/api/game/{2}/start"
       .replace("{0}", Config.serverURL).replace("{1}", Config.port)
-      .replace("{2}", gameToken), {"host": playerToken, "uuid": hostUuid, "narrator": narrator})
+      .replace("{2}", gameToken), {"host": playerToken, "uuid": hostUuid})
       .then(response => {
         this.sending = false;
         return response;

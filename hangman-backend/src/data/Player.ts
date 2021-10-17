@@ -8,13 +8,30 @@ export class Player {
   private token: PlayerToken | NullToken;
   private name: string;
   private role: GameRole;
-  private alive: boolean;
+  private word: string;
+  private readonly guesses: string[];
+  private incorrectGuesses: number;
 
   constructor() {
     this.token = TokenBuilder.nullToken();
     this.name = "Player";
     this.role = GameRole.UNDECIDED;
-    this.alive = true;
+    this.word = "";
+    this.guesses = [];
+    this.incorrectGuesses = 0;
+  }
+
+  public addGuess(guess: string): Player {
+    this.guesses.push(guess);
+    return this;
+  }
+
+  public getGuesses(): string[] {
+    return this.guesses;
+  }
+
+  public getIncorrectGuesses(): number {
+    return this.incorrectGuesses;
   }
 
   public getName(): string {
@@ -32,13 +49,16 @@ export class Player {
     return this.token;
   }
 
-  public isAlive(): boolean {
-    return this.alive;
+  public getWord(): string {
+    return this.word;
   }
 
-  public setDead(): Player {
-    this.alive = false;
-    return this;
+  /**
+   * Increase the number of incorrect guesses for this player
+   */
+  public increaseIncorrectGuesses(): number {
+    this.incorrectGuesses ++;
+    return this.incorrectGuesses;
   }
 
   public setName(name: string): Player {
@@ -53,6 +73,11 @@ export class Player {
 
   public setToken(token: PlayerToken): Player {
     this.token = token;
+    return this;
+  }
+
+  public setWord(word: string): Player {
+    this.word = word;
     return this;
   }
 }

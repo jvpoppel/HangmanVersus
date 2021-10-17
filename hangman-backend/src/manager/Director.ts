@@ -10,6 +10,8 @@ import {TokenManager} from "./TokenManager";
 import {FisherYatesShuffle} from "../util/FisherYatesShuffle";
 import {GameRole} from "../model/GameRole";
 import {Token} from "../model/Token";
+import {IsGuessCorrect} from "../questions/IsGuessCorrect";
+import {DidAllPlayersChooseAWord} from "../questions/DidAllPlayersChooseAWord";
 
 export class Director {
 
@@ -61,9 +63,10 @@ export class Director {
   }
 
   public joinGameForPlayer(gameToken: GameToken, playerName: string): string | undefined {
+    const resolvedGame: Game = GameManager.get().getByToken(gameToken);
     const newPlayer: Player = PlayerManager.get().create();
     newPlayer.setName(playerName);
-    if (GameManager.get().getByToken(gameToken).addPlayer(newPlayer)) {
+    if (resolvedGame.addPlayer(newPlayer)) {
       this.playersInGame.get(gameToken).add(newPlayer.getToken());
       getLogger().debug("[Director] Added player " + newPlayer.getToken().getToken() + " to game " + gameToken.getToken());
       return JSON.stringify({"player": newPlayer.getToken().getToken(), "uuid": newPlayer.getToken().getUUID()});
@@ -122,29 +125,21 @@ export class Director {
     return true;
   }
 
-  public startGameWithNarrator(gameToken: GameToken, narrator: PlayerToken): boolean | undefined {
+  public startGame(gameToken: GameToken): boolean | undefined {
 
     if (!GameManager.get().getByToken(gameToken).playerCanJoin()) {
       // Game has already been started, do nothing
       getLogger().info("[Director] Tried to start game " + gameToken.getToken() + " that has already been started.");
       return undefined;
     }
-    this.divideRolesForGame(gameToken, narrator);
+    this.divideRolesForGame(gameToken);
     return GameManager.get().getByToken(gameToken).start();
   }
 
   public getRoleOfPlayerAsPlayer(queryPlayer: Player, callingPlayer: Player): GameRole {
-    if (!callingPlayer.isAlive()) {
-      // Dead players and the narrator can see every role
-      return queryPlayer.getRole();
-    }
     if (callingPlayer === queryPlayer) {
       // A player is allowed to get their own role
       return callingPlayer.getRole();
-    }
-    if (!queryPlayer.isAlive()) {
-      // A player is allowed to see the roles of dead people
-      return queryPlayer.getRole();
     }
     if (callingPlayer.getRole() === GameRole.UNDECIDED) {
       // If roles have not yet been divided, return Undecided.
@@ -159,7 +154,7 @@ export class Director {
    * @param gameToken Game to divide roles for
    * @param narrator Narrator of given game
    */
-  public divideRolesForGame(gameToken: GameToken, narrator: PlayerToken): void {
+  public divideRolesForGame(gameToken: GameToken): void {
 
     const players: Array<Player> = new Array<Player>();
     const game: Game = GameManager.get().getByToken(gameToken);
@@ -200,25 +195,45 @@ export class Director {
   }
 
   /**
-   * AlivePlayersPerRoleInGame -> Returns a map, key = GameRole, value = amount of players with given role in game.
-   * To be used from a Game instance; thus no check on existance of game.
-   *
-   * @param gameToken Game Token of game to check
+   * Set the chosen word for a player in a game
    */
-  public alivePlayersPerRoleInGame(gameToken: GameToken): TSMap<GameRole, number> {
-    const toReturn = new TSMap<GameRole, number>();
-    this.playersInGame.get(gameToken).forEach(function(playerToken: PlayerToken) {
-      const player: Player = PlayerManager.get().getByToken(playerToken);
-      if (!player.isAlive()) {
-        return;
-      }
-      if (toReturn.has(player.getRole())) {
-        toReturn.set(player.getRole(), toReturn.get(player.getRole()) + 1); // Increase current value
-      } else {
-        toReturn.set(player.getRole(), 1); // First instance of role, set to 1.
-      }
-    });
-    return toReturn;
+  public setWordForPlayer(playerToken: PlayerToken, gameToken: GameToken, chosenWord: string): boolean | undefined {
+    if (!this.isPlayerInGame(playerToken, gameToken)) {
+      getLogger().debug("[Director] Could not set word for " + playerToken.getToken() + " in game " + gameToken.getToken() + ": Player not in game.");
+      return undefined;
+    }
+    if (PlayerManager.get().getByToken(playerToken).getWord() != "") {
+      return false;
+    }
+
+    PlayerManager.get().getByToken(playerToken).setWord(chosenWord);
+    if (DidAllPlayersChooseAWord.askedBy(playerToken).inGame(gameToken)) {
+      GameManager.get().getByToken(gameToken).setSubStateToPlayerOne();
+      GameManager.get().getByToken(gameToken).increaseIteration();
+    }
+    return true;
+  }
+
+  /**
+   * Add a guess for player
+   */
+  public addGuessForPlayer(playerToken: PlayerToken, gameToken: GameToken, guess: string): boolean | undefined {
+    if (!this.isPlayerInGame(playerToken, gameToken)) {
+      getLogger().debug("[Director] Could not add guess for " + playerToken.getToken() + " in game " + gameToken.getToken() + ": Player not in game.");
+      return undefined;
+    }
+
+    if (guess.length != 1) {
+      getLogger().debug("[Director] Could not add guess for " + playerToken.getToken() + " in game " + gameToken.getToken() + ": Guess not of length 1.");
+      return undefined;
+    }
+
+    PlayerManager.get().getByToken(playerToken).addGuess(guess);
+    if (!IsGuessCorrect.askedBy(playerToken).inGame(gameToken).guessing(guess)) {
+      PlayerManager.get().getByToken(playerToken).increaseIncorrectGuesses();
+    }
+    GameManager.get().getByToken(gameToken).increaseIteration();
+    return true;
   }
 
 }

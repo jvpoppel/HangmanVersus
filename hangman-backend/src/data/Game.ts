@@ -25,7 +25,6 @@ export class Game {
   private host: Player | undefined;
   private players: Player[];
   private substate: SubState;
-  private rolesInGame: GameRole[];
   private winningRole: GameRole;
 
   constructor() {
@@ -35,18 +34,24 @@ export class Game {
     this.host = undefined;
     this.players = [];
     this.substate = SubState.PLAYERS_CHOOSING_WORDS;
-    this.rolesInGame = [];
     this.winningRole = GameRole.UNDECIDED;
   }
 
   /* Below method should only be called from Director */
   public addPlayer(player: Player): boolean {
+    if (this.amountOfPlayersInGame() > 1) {
+      return false; // Max. amount of players is 2
+    }
     if (this.players.includes(player)) {
       return false;
     }
     this.players.push(player);
     this.increaseIteration();
     return true;
+  }
+
+  public amountOfPlayersInGame(): number {
+    return this.players.length;
   }
 
   /* Below method should only be called from Director */
@@ -87,20 +92,6 @@ export class Game {
 
   public playerCanJoin(): boolean {
     return this.state == GameState.OPEN_WAITFORPLAYERS;
-  }
-
-  public addRoleToGame(role: GameRole): void {
-    this.rolesInGame.push(role);
-  }
-
-  /**
-   * Removes given role from roles in game.
-   * Use case: Last player of given role dies, thus the role is no longer in game.
-   *
-   * @param role role to remove from game
-   */
-  public removeRoleFromGame(role: GameRole): void {
-    this.rolesInGame.splice(this.rolesInGame.indexOf(role), 1);
   }
 
   public setHost(host: Player): Game {
@@ -161,23 +152,15 @@ export class Game {
     return this.winningRole;
   }
 
-  private getAlivePlayers(): Player[] {
-    const alivePlayers: Player[] = [];
-    this.players.forEach(player => { if (player.isAlive()) {
-      alivePlayers.push(player);
-    }});
-    return alivePlayers;
-  }
-
   /**
-   * Only to be used from Director when receiving Medium night action
+   * Only to be used from Director after processing a guess from Player Two
    */
   public setSubStateToPlayerOne(): void {
     this.substate = SubState.PLAYER_ONE_CHOOSING;
   }
 
   /**
-   * Only to be used from Night, when i.e. the medium decided on which player they want to check
+   * Only to be used from Director after processing a guess from Player One
    */
   public setSubStateToPlayerTwo(): void {
     this.substate = SubState.PLAYER_TWO_CHOOSING;
@@ -193,7 +176,6 @@ export class Game {
     this.token = TokenBuilder.nullToken();
     this.host = undefined;
     this.players = [];
-    this.rolesInGame = [];
 
     return this;
 

@@ -7,7 +7,7 @@ module.exports = {
   },
   output: {
     filename: "bundle.js",
-    path: path.resolve(__dirname, "./dist/wolves-frontend/")
+    path: path.resolve(__dirname, "./dist/hangman-frontend/")
   },
   mode: "development"
 };

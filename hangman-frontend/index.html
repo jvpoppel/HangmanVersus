@@ -57,12 +57,6 @@
         </div>
 
         <div class="container" id="container-game" style="display: none">
-          <div class="row" id="role-info">
-            <div class="col-md-10 text-center"></div>
-            <div class="col-md-2 text-center">
-              <button id="showRoleInfo" class="btn btn-info">Role info</button>
-            </div>
-          </div>
           <div class="row">
             <div class="col-md-12 text-center">
               <h2>Game code: </h2>
@@ -79,9 +73,6 @@
                     <th>
                       Players
                     </th>
-                    <th>
-                      Narrator?
-                    </th>
                     <th></th>
                   </tr>
                 </thead>
@@ -93,12 +84,6 @@
                 <tr>
                   <th>
                     Players
-                  </th>
-                  <th>
-                    Role
-                  </th>
-                  <th>
-                    Alive
                   </th>
                 </tr>
                 </thead>
@@ -142,114 +127,55 @@
               <hr>
             </div>
           </div>
-
-          <div class="row" id="row-night-role-selection" style="display: none">
-            <div class="col-md-1"></div>
-            <div class="col-md-10 text-center">
-              <table class="table">
-                <tbody id="rolesToPerform">
-                <tr>
-                  <td>
-                    <button id="werewolves-night" class="btn btn-outline-danger">Wolves</button>
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <button id="medium-night" class="btn btn-outline-warning">Medium</button>
-                  </td>
-                </tr>
-                <tr id="playersKilledRow">
-                  <td>
-                    <span>Players killed in this night: </span><span id="playersKilled"></span>
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <button id="finishNight" style="display: none" class="btn btn-outline-primary">Finish night</button>
-                  </td>
-                </tr>
-                </tbody>
-              </table>
-            </div>
-            <div class="col-md-1"></div>
-          </div>
-
-          <div class="row text-center" id="row-night-medium" style="display: none">
-            <div id="medium-pre-select">
-              <div class="col-md-2"></div>
-              <div class="col-md-8">
-                <label for="medium-selection">Of which player do you want to see the role? </label><select id="medium-selection"> </select><button class="btn btn-info" id="medium-submit">Submit</button>
-              </div>
-              <div class="col-md-2"></div>
-            </div>
-            <div id="medium-post-select" style="display: none">
-              <div class="col-md-2"></div>
-              <div class="col-md-8">
-                <label for="medium-player-name"></label><span id="medium-player-name"></span><span> is a </span><span id="medium-player-role"></span>
-              </div>
-              <div class="col-md-2"></div>
+          <div class="row" id="row-choose-word" style="display: none">
+            <div class="col-md-12 text-center">
+              <label for="wordInput">Choose your word: </label>
+              <input type="text" id="wordInput">
+              <button type="button" class="btn btn-info" id="wordSubmit">Submit</button>
             </div>
           </div>
-          <!-- Game row: Voting results table -->
-          <div id="row-vote-results" style="display: none">
-            <div class="row">
-              <table class="table table-striped">
-                <thead>
-                <tr>
-                  <th>Player</th>
-                  <th>Voted on</th>
-                </tr>
-                </thead>
-                <tbody id="vote-result-table-content">
-
-                </tbody>
-              </table>
+          <div class="row" id="row-guess" style="display: none">
+            <div class="col-md-12 text-center">
+              <label for="guessInput">Your guess: </label>
+              <input type="text" id="guessInput">
+              <button type="button" class="btn btn-info" id="guessSubmit">Submit</button>
             </div>
           </div>
-          <!-- Player row: Voting process -->
-          <div id="row-vote-players" style="display: none">
-            <div class="row text-center">
-              <div class="col-md-3"></div>
-              <div class="col-md-6">
-                <label for="vote-list">Who are you voting on? </label><select id="vote-list"></select>
+          <div class="row" id="row-playersections" style="display: none">
+            <div class="col-md-6 text-center" id="col-ownplayer">
+              <div class="row">
+                <div class="col-md-12 text-center">
+                  <h2>Chosen word: </h2>
+                  <h2 id="ownWord"></h2>
+                </div>
               </div>
-              <div class="col-md-3"></div>
-            </div>
-            <div class="row">
-              <div class="col-md-2"></div>
-              <div class="col-md-8">
-                <button class="btn btn-outline-primary btn-block" id="vote-lock">Lock vote</button>
+              <div class="row">
+                <div class="col-md-12 text-center">
+                  <h2>Guesses on your word: </h2>
+                  <h2 id="guessesMyWord"></h2>
+                </div>
               </div>
-              <div class="col-md-2"></div>
-            </div>
-          </div>
-          <!-- Narrator row: Voting process -->
-          <div id="row-vote-narrator" style="display: none">
-            <div class="row text-center">
-              <div class="col-md-12">
-                <span>Vote result: </span><span id="vote-result-narrator"></span>
+              <div class="row">
+                <div class="col-md-12 text-center">
+                  <h2>Incorrect guesses: </h2>
+                  <h2 id="ownIncorrectGuesses"></h2>
+                </div>
               </div>
             </div>
-            <div class="row text-center">
-              <div class="col-md-12">
-                <span>Players that still have to vote: </span><span id="players-that-have-to-vote"></span>
+            <div class="col-md-6 text-center" id="col-opponent">
+              <div class="row">
+                <div class="col-md-12 text-center">
+                  <h2>Guesses: </h2>
+                  <h2 id="guessesOpponentWord"></h2>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-12 text-center">
+                  <h2>Incorrect guesses: </h2>
+                  <h2 id="theirIncorrectGuesses"></h2>
+                </div>
               </div>
             </div>
-            <div class="row text-center">
-              <div class="col-md-12">
-                <button class="btn btn-primary" id="vote-reset" style="display: none">Reset vote</button>
-                <button class="btn btn-primary" id="vote-finish" style="display: none">Finish vote</button>
-              </div>
-            </div>
-          </div>
-          <!-- Narrator row: Start night -->
-          <div class="row text-center" id="row-startNight" style="display: none">
-            <div class="col-md-3"></div>
-            <div class="col-md-6">
-              <button class="btn btn-outline-primary" id="startNight">Start night</button>
-            </div>
-            <div class="col-md-3"></div>
-          </div>
           </div>
       </div>
         <footer id="footer">
