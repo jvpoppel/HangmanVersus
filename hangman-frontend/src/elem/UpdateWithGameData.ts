@@ -6,6 +6,7 @@ import {LocalStorage} from "../data/LocalStorage";
 import {DisplayManager} from "./DisplayManager";
 import {KickPlayerFromGameAPI} from "../api/KickPlayerFromGameAPI";
 import {SubState} from "../model/SubState";
+import {FormattedOwnWord} from "../questions/FormattedOwnWord";
 
 export class UpdateWithGameData {
   public static perform(data: GameData): void {
@@ -84,7 +85,7 @@ export class UpdateWithGameData {
         const opponentGuesses = Array.from(data.opponentGuesses);
         DisplayManager.SHOW_WORD_SECTION();
         DisplayManager.HIDE_WORD_INPUT();
-        WebElements.OWN_CHOSEN_WORD().innerText = data.ownWord;
+        WebElements.OWN_CHOSEN_WORD().innerHTML = FormattedOwnWord.givenOwnWord(data.ownWord).andGuesses(data.opponentGuesses);
         WebElements.GUESSES_OWN_WORD().innerText = opponentGuesses.toString();
         WebElements.OWN_INCORRECT_GUESSES().innerText = "" + data.ownIncorrectGuesses;
         WebElements.GUESSES_OPPONENT_WORD().innerText = playerGuesses.toString();

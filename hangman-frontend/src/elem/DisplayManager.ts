@@ -49,6 +49,7 @@ export class DisplayManager {
     WebElements.WORD_SECTION().style.display = "none";
     WebElements.WORD_SELECTION_SECTION().style.display = "none";
     WebElements.GUESS_SELECTION_SECTION().style.display = "none";
+    (<HTMLInputElement> WebElements.JOIN_TOKEN()).value = "";
   }
 
   public static HIDE_START_STOP(): void {
@@ -64,6 +65,7 @@ export class DisplayManager {
   }
 
   public static SHOW_WORD_SECTION(): void {
+    (<HTMLInputElement> WebElements.WORD_INPUT()).value = "";
     WebElements.WORD_SECTION().style.display = "";
   }
 
@@ -80,7 +82,8 @@ export class DisplayManager {
   }
 
   public static SHOW_GUESS_INPUT(): void {
-    WebElements.GUESS_SELECTION_SECTION().style.display = "";
+    (<HTMLInputElement> WebElements.GUESS_INPUT()).value = "";
+      WebElements.GUESS_SELECTION_SECTION().style.display = "";
   }
 
   public static HIDE_GUESS_INPUT(): void {

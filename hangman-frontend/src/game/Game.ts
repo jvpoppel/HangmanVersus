@@ -52,10 +52,11 @@ export class Game {
             })));
         this.iteration = newGameData.iteration;
         UpdateWithGameData.perform(newGameData);
-        if (newGameData.gameState === "RESOLVED_FINALIZE" || newGameData.gameState === "RESOLVED_WAITFORTOKENRELEASE") {
+        if (newGameData.gameState === "RESOLVED_WAITFORTOKENRELEASE") {
           // Game finished.
           this.run = false;
-          window.alert("Game finished: Role that won = " + newGameData.winningRole);
+          LocalStorage.clear();
+          DisplayManager.GameToHomePage();
         }
       }
     }
