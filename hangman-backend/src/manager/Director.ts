@@ -122,6 +122,16 @@ export class Director {
     PlayerManager.get().deleteByToken(playerToken);
     this.playersInGame.get(gameToken).delete(playerToken);
     TokenManager.get().delete(playerToken.getToken());
+
+    // If last player is gone from game, delete game.
+    if (this.playersInGame.get(gameToken).size === 0) {
+      getLogger().debug("[Director] Game " + gameToken + " is empty; removing.");
+      this.playersInGame.delete(gameToken);
+      GameManager.get().getByToken(gameToken).cleanup();
+      GameManager.get().deleteByToken(gameToken);
+      TokenManager.get().delete(gameToken.getToken());
+    }
+
     return true;
   }
 
@@ -171,7 +181,7 @@ export class Director {
   }
 
   /**
-   * Add a guess for player
+   * Add a guess for player. Also checks for the win conditions and ends the game if needed.
    */
   public addGuessForPlayer(playerToken: PlayerToken, gameToken: GameToken, guess: string): boolean | undefined {
     if (!this.isPlayerInGame(playerToken, gameToken)) {
