@@ -79,8 +79,10 @@ export class Main {
   public async performDisconnectFromGameApi(): Promise<void> {
     await DisconnectAPI.send(LocalStorage.gameToken(), LocalStorage.playerToken(), LocalStorage.uuid()).then(response => {
       if (response.status === "success") {
+        this.currentGame.terminate();
         LocalStorage.clear();
         DisplayManager.GameToHomePage();
+        this.currentGame = null;
       }
     });
   }

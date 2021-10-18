@@ -27,6 +27,11 @@ export class Game {
     return this;
   }
 
+  public terminate(): Game {
+    this.run = false;
+    return this;
+  }
+
   private sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
