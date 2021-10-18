@@ -10,7 +10,6 @@ export interface GameData {
   winningRole?: string,
   playerTokens?: string[],
   playerNames?: string[],
-  playerRoles?: string[],
   substate?: string,
   ownWord?: string,
   ownGuesses?: string[],

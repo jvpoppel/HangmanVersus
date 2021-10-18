@@ -59,6 +59,10 @@ export class DisplayManager {
     WebElements.START().style.display = "";
   }
 
+  public static HIDE_START(): void {
+    WebElements.START().style.display = "none";
+  }
+
   public static SHOW_WORD_SECTION(): void {
     WebElements.WORD_SECTION().style.display = "";
   }

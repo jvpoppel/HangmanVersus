@@ -7,11 +7,11 @@ import {PlayerToken} from "../model/PlayerToken";
 import {TSMap} from "typescript-map";
 import {getLogger} from "../endpoint";
 import {TokenManager} from "./TokenManager";
-import {FisherYatesShuffle} from "../util/FisherYatesShuffle";
 import {GameRole} from "../model/GameRole";
 import {IsGuessCorrect} from "../questions/IsGuessCorrect";
 import {DidAllPlayersChooseAWord} from "../questions/DidAllPlayersChooseAWord";
 import {SubState} from "../model/SubState";
+import {FormattedOpponentWordWithGuesses} from "../questions/FormattedOpponentWordWithGuesses";
 
 export class Director {
 
@@ -136,62 +136,18 @@ export class Director {
     return GameManager.get().getByToken(gameToken).start();
   }
 
-  public getRoleOfPlayerAsPlayer(queryPlayer: Player, callingPlayer: Player): GameRole {
-    if (callingPlayer === queryPlayer) {
-      // A player is allowed to get their own role
-      return callingPlayer.getRole();
-    }
-    if (callingPlayer.getRole() === GameRole.UNDECIDED) {
-      // If roles have not yet been divided, return Undecided.
-      return GameRole.UNDECIDED;
-    }
-    // If none of the above conditions apply, return Undecided.
-    return GameRole.UNDECIDED;
-  }
+  private divideRolesForGame(gameToken: GameToken): void {
 
-  /**
-   * Given a game and it's designated narrator, give all players in game a random role.
-   * @param gameToken Game to divide roles for
-   * @param narrator Narrator of given game
-   */
-  public divideRolesForGame(gameToken: GameToken): void {
+    const playersInGame: PlayerToken[] = Array.from(this.playersInGame.get(gameToken));
 
-    const players: Array<Player> = new Array<Player>();
-    const game: Game = GameManager.get().getByToken(gameToken);
-    this.playersInGame.get(gameToken).forEach(function(playerToken) {
-      players.push(PlayerManager.get().getByToken(playerToken));
-    });
-
-    let amountOfWolves = 1;
-    //let amountOfCivilians = 0;
-    let amountOfMediums = 0;
-    if ((players.length - 1) >= 8) {
-      amountOfWolves++; // Two wolves when players.size >= 8 and < 12
+    // Host is always player one
+    if (playersInGame[0].getToken() === GameManager.get().getByToken(gameToken).getHost()) {
+      PlayerManager.get().getByToken(playersInGame[0]).setRole(GameRole.PLAYER_ONE);
+      PlayerManager.get().getByToken(playersInGame[1]).setRole(GameRole.PLAYER_TWO);
+    } else {
+      PlayerManager.get().getByToken(playersInGame[1]).setRole(GameRole.PLAYER_ONE);
+      PlayerManager.get().getByToken(playersInGame[0]).setRole(GameRole.PLAYER_TWO);
     }
-    if ((players.length - 1) >= 12) {
-      amountOfWolves++; // Three wolves when players.size >= 12
-    }
-    // Amount of civilians = #players - one narrator - amount of special-role-players (medium / wolf / etc)
-    //amountOfCivilians = players.length - 1 - amountOfMediums - amountOfWolves;
-
-    const shuffledPlayers: Player[] = FisherYatesShuffle<Player>(players);
-    shuffledPlayers.forEach(function(player) {
-      if (amountOfWolves > 0) {
-        getLogger().debug("[Director] Given role WOLF to player " + player.getToken().getToken());
-        player.setRole(GameRole.UNDECIDED);
-        amountOfWolves--;
-        return;
-      }
-      if (amountOfMediums > 0) {
-        getLogger().debug("[Director] Given role MEDIUM to player " + player.getToken().getToken());
-        player.setRole(GameRole.UNDECIDED);
-        amountOfMediums--;
-        return;
-      }
-      getLogger().debug("[Director] Given role CIVILIAN to player " + player.getToken().getToken());
-      player.setRole(GameRole.UNDECIDED);
-      return;
-    });
   }
 
   /**
@@ -233,7 +189,24 @@ export class Director {
       PlayerManager.get().getByToken(playerToken).increaseIncorrectGuesses();
     }
     const game = GameManager.get().getByToken(gameToken);
-    if (game.getSubState() === SubState.PLAYER_ONE_CHOOSING) {
+
+    if (FormattedOpponentWordWithGuesses.askedBy(playerToken).inGame(gameToken).indexOf("_") < 0) {
+      // No underscores in formatted word; Word completely guessed!
+      if (game.getHost() === playerToken.getToken()) {
+        // Player one won!
+        game.finish(GameRole.PLAYER_ONE);
+      } else {
+        game.finish(GameRole.PLAYER_TWO);
+      }
+    } else if (PlayerManager.get().getByToken(playerToken).getIncorrectGuesses() > 5) {
+      // More than 6 incorrect guesses; other player wins!
+      if (game.getHost() === playerToken.getToken()) {
+        // Player one has too many incorrect guesses, player two wins.
+        game.finish(GameRole.PLAYER_TWO);
+      } else {
+        game.finish(GameRole.PLAYER_ONE);
+      }
+    } else if (game.getSubState() === SubState.PLAYER_ONE_CHOOSING) {
       game.setSubStateToPlayerTwo();
     } else if (game.getSubState() === SubState.PLAYER_TWO_CHOOSING) {
       game.setSubStateToPlayerOne();

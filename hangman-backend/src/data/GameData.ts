@@ -38,8 +38,6 @@ export class GameData {
     const playersInGameLST = Array.from(playersInGame);
     const playerNamesInGame: string[] = playersInGameLST.map(playerToken => PlayerManager.get().getByToken(playerToken).getName());
     const playerTokensInGame: string[] = playersInGameLST.map(playerToken => playerToken.getToken());
-    const playerRolesInGame: string[] = playersInGameLST.map(queryToken =>
-      Director.get().getRoleOfPlayerAsPlayer(PlayerManager.get().getByToken(queryToken), player));
     const iteration = game.getIteration();
 
     const generalGameData: any = {
@@ -54,7 +52,6 @@ export class GameData {
       "winningRole": game.getWinningRole(),
       "playerTokens": playerTokensInGame,
       "playerNames": playerNamesInGame,
-      "playerRoles": playerRolesInGame,
       "substate": game.getSubState()
     };
     return GameData.addPlayerSpecificData(game, player, playersInGameLST, generalGameData);

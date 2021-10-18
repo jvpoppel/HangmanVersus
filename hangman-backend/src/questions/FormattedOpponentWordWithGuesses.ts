@@ -4,6 +4,7 @@ import {Director} from "../manager/Director";
 import {NullToken} from "../model/NullToken";
 import {PlayerManager} from "../manager/PlayerManager";
 import {Player} from "../data/Player";
+import {GameManager} from "../manager/GameManager";
 
 export class FormattedOpponentWordWithGuesses {
 
@@ -39,6 +40,12 @@ export class FormattedOpponentWordWithGuesses {
 
     const guesses: string[] = ownPlayer.getGuesses();
     const word: string[] = [...opponentPlayer.getWord().toLowerCase()];
+
+    if (GameManager.get().getByToken(game).isFinished()) {
+      // Game finished; just return complete word.
+      return word;
+    }
+
     let index = 0;
 
     while (index < word.length) {

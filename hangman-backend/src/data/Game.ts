@@ -124,13 +124,6 @@ export class Game {
     return this.substate;
   }
 
-
-  public checkWinConditions(): void {
-
-    // TODO: Define
-    // i.e. this.finish(GameRole.PLAYER_ONE);
-  }
-
   /**
    * Put gamestate to Finalized and define the winning role.
    *

@@ -28,6 +28,17 @@ export function apiStartGame(supposedHost: string, givenToken: string): string {
     return "unauthorized";
   }
 
+  const playersInGame: Set<PlayerToken> | undefined = Director.get().getPlayersInGame(gameToken);
+  if (playersInGame === undefined) {
+    getLogger().debug("[APIStartGame] Game " + gameToken + " could not be found in the Director");
+    return "failed";
+  }
+
+  if (playersInGame.size != 2) {
+    getLogger().debug("[APIStartGame] Game " + givenToken + " could not be started, not exactly 2 players.");
+    return "failed"; // Game not started, it needs exactly two players.
+  }
+
   const gameStarted: boolean | undefined = Director.get().startGame(gameToken);
   if (gameStarted === undefined) {
     getLogger().debug("[APIStartGame] Game " + givenToken + " could not be started.");

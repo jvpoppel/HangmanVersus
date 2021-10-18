@@ -14,7 +14,6 @@ export class UpdateWithGameData {
 
     const playerTokensAsList = Array.from(data.playerTokens);
     const playerNamesAsList = Array.from(data.playerNames);
-    const playerRolesAsList = Array.from(data.playerRoles);
 
     // First; update player list.
     let htmlToAdd = "";
@@ -67,8 +66,11 @@ export class UpdateWithGameData {
     Next, we update the display values of the Start and Disconnect buttons
      */
     if (data.started == false) {
-      if (playerIsHost) {
+      // If game not started; check if can be started and show start button accordingly
+      if (playerIsHost && playerTokensAsList.length === 2) {
         DisplayManager.SHOW_START();
+      } else {
+        DisplayManager.HIDE_START();
       }
     } else {
       DisplayManager.HIDE_START_STOP();
