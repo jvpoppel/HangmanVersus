@@ -118,18 +118,24 @@ export class Director {
     }
 
     // Player is in game, remove from PlayerManager & PlayersInGame and delete all token references.
-    GameManager.get().getByToken(gameToken).deletePlayer(PlayerManager.get().getByToken(playerToken));
+    const involvedGame = GameManager.get().getByToken(gameToken);
+    involvedGame.deletePlayer(PlayerManager.get().getByToken(playerToken));
     PlayerManager.get().deleteByToken(playerToken);
     this.playersInGame.get(gameToken).delete(playerToken);
     TokenManager.get().delete(playerToken.getToken());
+    involvedGame.increaseIteration();
 
     // If last player is gone from game, delete game.
     if (this.playersInGame.get(gameToken).size === 0) {
       getLogger().debug("[Director] Game " + gameToken + " is empty; removing.");
       this.playersInGame.delete(gameToken);
-      GameManager.get().getByToken(gameToken).cleanup();
+      involvedGame.cleanup();
       GameManager.get().deleteByToken(gameToken);
       TokenManager.get().delete(gameToken.getToken());
+    } else if (involvedGame.getHost() === playerToken.getToken()) {
+      // Old host disconnected! Pick a new player to become host
+      involvedGame.setHost(PlayerManager.get().getByToken(Array.from(this.playersInGame.get(gameToken))[0]));
+      involvedGame.increaseIteration();
     }
 
     return true;
