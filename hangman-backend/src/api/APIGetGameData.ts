@@ -7,17 +7,22 @@ import {GameData} from "../data/GameData";
 
 export function apiGetGameData(gameToken: string, playerToken: string, iteration: number): any {
   const resolvedPlayer: PlayerToken | NullToken = TokenManager.get().getFromString(playerToken);
-  const resolvedGame: GameToken | NullToken = TokenManager.get().getFromString(gameToken);
+  const resolvedGameToken: GameToken | NullToken = TokenManager.get().getFromString(gameToken);
 
-  if (resolvedPlayer.isNullToken() || resolvedGame.isNullToken()) {
+  if (resolvedPlayer.isNullToken() || resolvedGameToken.isNullToken()) {
     return "failed";
   }
 
-  if (iteration == GameManager.get().getByToken(resolvedGame).getIteration()) {
+  const resolvedGame = GameManager.get().getByToken(resolvedGameToken);
+  if (resolvedGame === undefined) {
+    return "failed";
+  }
+
+  if (iteration == resolvedGame.getIteration()) {
     return "notChanged";
   }
 
-  const result: string = GameData.convert(resolvedGame, <PlayerToken> resolvedPlayer);
+  const result: string = GameData.convert(resolvedGameToken, <PlayerToken> resolvedPlayer);
   if (result === "failed") { // If statement doesn't add much for now, implemented for later expansion.
     return "failed";
   }

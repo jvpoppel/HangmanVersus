@@ -63,7 +63,10 @@ export class Director {
   }
 
   public joinGameForPlayer(gameToken: GameToken, playerName: string): string | undefined {
-    const resolvedGame: Game = GameManager.get().getByToken(gameToken);
+    const resolvedGame: Game | undefined = GameManager.get().getByToken(gameToken);
+    if (resolvedGame === undefined) {
+      return undefined;
+    }
     const newPlayer: Player = PlayerManager.get().create();
     newPlayer.setName(playerName);
     if (resolvedGame.addPlayer(newPlayer)) {
@@ -106,19 +109,23 @@ export class Director {
       return undefined;
     }
 
+    const involvedGame = GameManager.get().getByToken(gameToken);
+    if (involvedGame === undefined) {
+      return undefined;
+    }
+
     // Special case: Game finished.
     // In this case, only return 'True', as end screen has to be intact for remaining players
-    if (GameManager.get().getByToken(gameToken).isFinished()) {
+    if (involvedGame.isFinished()) {
       return true;
     }
 
-    if (!GameManager.get().getByToken(gameToken).playerCanJoin()) {
+    if (!involvedGame.playerCanJoin()) {
       getLogger().debug("[Director] Could not kick player " + playerToken.getToken() + " from game " + gameToken.getToken() + ": Game already started!");
       return undefined;
     }
 
     // Player is in game, remove from PlayerManager & PlayersInGame and delete all token references.
-    const involvedGame = GameManager.get().getByToken(gameToken);
     involvedGame.deletePlayer(PlayerManager.get().getByToken(playerToken));
     PlayerManager.get().deleteByToken(playerToken);
     this.playersInGame.get(gameToken).delete(playerToken);
@@ -142,22 +149,39 @@ export class Director {
   }
 
   public startGame(gameToken: GameToken): boolean | undefined {
+    const involvedGame = GameManager.get().getByToken(gameToken);
+    if (involvedGame === undefined) {
+      return undefined;
+    }
 
-    if (!GameManager.get().getByToken(gameToken).playerCanJoin()) {
+    if (!involvedGame.playerCanJoin()) {
       // Game has already been started, do nothing
       getLogger().info("[Director] Tried to start game " + gameToken.getToken() + " that has already been started.");
       return undefined;
     }
     this.divideRolesForGame(gameToken);
-    return GameManager.get().getByToken(gameToken).start();
+    return involvedGame.start();
+  }
+
+  public deleteGame(gameToken: GameToken): boolean {
+    if (GameManager.get().getByToken(gameToken) !== undefined) {
+      // Game cleanup not finished, cannot delete game
+      return false;
+    } else {
+      return this.playersInGame.delete(gameToken);
+    }
   }
 
   private divideRolesForGame(gameToken: GameToken): void {
 
     const playersInGame: PlayerToken[] = Array.from(this.playersInGame.get(gameToken));
+    const involvedGame = GameManager.get().getByToken(gameToken);
+    if (involvedGame === undefined) {
+      return;
+    }
 
     // Host is always player one
-    if (playersInGame[0].getToken() === GameManager.get().getByToken(gameToken).getHost()) {
+    if (playersInGame[0].getToken() === involvedGame.getHost()) {
       PlayerManager.get().getByToken(playersInGame[0]).setRole(GameRole.PLAYER_ONE);
       PlayerManager.get().getByToken(playersInGame[1]).setRole(GameRole.PLAYER_TWO);
     } else {
@@ -179,9 +203,13 @@ export class Director {
     }
 
     PlayerManager.get().getByToken(playerToken).setWord(chosenWord);
+    const involvedGame = GameManager.get().getByToken(gameToken);
+    if (involvedGame === undefined) {
+      return undefined;
+    }
     if (DidAllPlayersChooseAWord.askedBy(playerToken).inGame(gameToken)) {
-      GameManager.get().getByToken(gameToken).setSubStateToPlayerOne();
-      GameManager.get().getByToken(gameToken).increaseIteration();
+      involvedGame.setSubStateToPlayerOne();
+      involvedGame.increaseIteration();
     }
     return true;
   }
@@ -205,6 +233,9 @@ export class Director {
       PlayerManager.get().getByToken(playerToken).increaseIncorrectGuesses();
     }
     const game = GameManager.get().getByToken(gameToken);
+    if (game === undefined) {
+      return undefined;
+    }
 
     if (FormattedOpponentWordWithGuesses.askedBy(playerToken).inGame(gameToken).indexOf("_") < 0) {
       // No underscores in formatted word; Word completely guessed!

@@ -10,17 +10,20 @@ describe("Basic game flows", () => {
   it("Create and start game", async () => {
 
     const createdGame: Game = GameManager.get().create();
+    if (createdGame === undefined) {
+      chai.expect(true).to.be.false;
+    }
     const token: string = createdGame.getToken().getToken();
     chai.expect(token.length).to.be.equal(8); // TODO: Change to config value
 
     const gameToken: Token = TokenManager.get().getFromString(token);
     chai.expect(gameToken).instanceOf(GameToken);
 
-    chai.expect(GameManager.get().getByToken(gameToken).getState()).to.be.equal("OPEN_WAITFORPLAYERS");
+    chai.expect(createdGame.getState()).to.be.equal("OPEN_WAITFORPLAYERS");
 
     createdGame.start();
 
-    chai.expect(GameManager.get().getByToken(gameToken).getState()).to.be.equal("OPEN_INPROGRESS");
+    chai.expect(createdGame.getState()).to.be.equal("OPEN_INPROGRESS");
 
   });
 });

@@ -36,7 +36,10 @@ export class GameManager {
    * // TODO: Implement check if game exists
    * @param token Game token
    */
-  public getByToken(token: GameToken): Game {
+  public getByToken(token: GameToken): Game | undefined {
+    if (!this.games.has(token)) {
+      return undefined;
+    }
     return this.games.get(token);
   }
 

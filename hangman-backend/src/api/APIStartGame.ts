@@ -21,7 +21,11 @@ export function apiStartGame(supposedHost: string, givenToken: string): string {
     return "failed"; // No game on given token
   }
 
-  const game: Game = GameManager.get().getByToken(gameToken);
+  const game: Game | undefined = GameManager.get().getByToken(gameToken);
+  if (game === undefined) {
+    getLogger().debug("[APIStartGame] Given game " + gameToken + " cannot be found in GameManager.");
+    return "failed";
+  }
 
   if (!(supposedHost === game.getHost())) {
     getLogger().debug("[APIStartGame] Given player " + supposedHost + " is not the game host.");

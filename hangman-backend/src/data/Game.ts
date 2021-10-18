@@ -9,6 +9,8 @@ import {TSMap} from "typescript-map";
 import {PlayerToken} from "../model/PlayerToken";
 import {PlayerManager} from "../manager/PlayerManager";
 import {getLogger} from "../endpoint";
+import {TokenManager} from "../manager/TokenManager";
+import {GameManager} from "../manager/GameManager";
 
 enum GameState {
   OPEN_WAITFORPLAYERS = "OPEN_WAITFORPLAYERS",
@@ -134,6 +136,7 @@ export class Game {
     this.winningRole = winningRole;
     this.substate = SubState.GAME_FINISHED;
     this.increaseIteration();
+    this.waitForTokenRelease();
     return this;
   }
 
@@ -161,10 +164,37 @@ export class Game {
   }
 
   /**
+   * After one minute; change game state to 'Change To Token Release' and increase iteration one final time.
+   * After one more minute, call cleanup and remove from token managers.
+   */
+  private async waitForTokenRelease(): Promise<void> {
+    this.sleep(60000).then(() => {
+      this.state = GameState.RESOLVED_WAITFORTOKENRELEASE;
+      this.increaseIteration();
+      this.sleep(60000).then(async () => {
+        await this.players.forEach(player => {
+          PlayerManager.get().deleteByToken(player.getToken());
+          TokenManager.get().delete(player.getToken().getToken());
+        });
+        GameManager.get().deleteByToken(this.token);
+        TokenManager.get().delete(this.token.getToken());
+        Director.get().deleteGame(this.token);
+        this.cleanup();
+      });
+    });
+  }
+
+  private sleep(ms: number) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  /**
    * To be called on game deletion; resets all data to begin values
    * I.e. removes all references to other data
    */
   public cleanup(): Game {
+
+    getLogger().debug("[Game " + this.token.getToken() + "] Cleanup started.");
 
     this.token = TokenBuilder.nullToken();
     this.host = undefined;

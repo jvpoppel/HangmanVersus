@@ -22,6 +22,12 @@ export class FormattedOpponentWordWithGuesses {
 
   public inGame(game: GameToken): string[] {
     this.game = game;
+
+    const involvedGame = GameManager.get().getByToken(game);
+    if (involvedGame === undefined) {
+      return [];
+    }
+
     const playersInGame: Set<PlayerToken> | undefined = Director.get().getPlayersInGame(this.game);
     if (playersInGame === undefined) {
       return []; // Game does not exist
@@ -41,7 +47,7 @@ export class FormattedOpponentWordWithGuesses {
     const guesses: string[] = ownPlayer.getGuesses();
     const word: string[] = [...opponentPlayer.getWord().toLowerCase()];
 
-    if (GameManager.get().getByToken(game).isFinished()) {
+    if (involvedGame.isFinished()) {
       // Game finished; just return complete word.
       return word;
     }

@@ -9,17 +9,23 @@ import {getLogger} from "../endpoint";
 export function apiKickPlayer(playerToKick: string, supposedHost: string, gameToken: string): string {
   const resolvedPlayerToKick: PlayerToken | NullToken = TokenManager.get().getFromString(playerToKick);
   const resolvedSupposedHost: PlayerToken | NullToken = TokenManager.get().getFromString(supposedHost);
-  const resolvedGame: GameToken | NullToken = TokenManager.get().getFromString(gameToken);
+  const resolvedGameToken: GameToken | NullToken = TokenManager.get().getFromString(gameToken);
 
-  if (resolvedPlayerToKick.isNullToken() || resolvedGame.isNullToken() || resolvedSupposedHost.isNullToken()) {
+  if (resolvedPlayerToKick.isNullToken() || resolvedGameToken.isNullToken() || resolvedSupposedHost.isNullToken()) {
     getLogger().debug("[apiKickPlayer] One of the provided tokens was Null");
     return "failed";
   }
-  if (GameManager.get().getByToken(resolvedGame).getHost() != supposedHost) {
+
+  const resolvedGame = GameManager.get().getByToken(resolvedGameToken);
+  if (resolvedGame === undefined) {
+    return "failed";
+  }
+
+  if (resolvedGame.getHost() != supposedHost) {
     return "unauthorized";
   }
 
-  const response: boolean | undefined = Director.get().kickPlayerFromGame(<PlayerToken> resolvedPlayerToKick, resolvedGame);
+  const response: boolean | undefined = Director.get().kickPlayerFromGame(<PlayerToken> resolvedPlayerToKick, resolvedGameToken);
   if (response === undefined) {
     return "failed";
   } else {

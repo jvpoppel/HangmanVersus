@@ -15,6 +15,10 @@ describe("IsGuessCorrect tests", () => {
 
     const gameData = Director.get().createGameForPlayer("Player1");
     const createdGame = GameManager.get().getByToken(TokenManager.get().getFromString(gameData.get("gameToken")));
+    if (createdGame === undefined) {
+      chai.expect(true).to.be.false;
+      return;
+    }
 
     // Add second players to game
     Director.get().joinGameForPlayer(createdGame.getToken(),"Player2");
@@ -44,6 +48,10 @@ describe("IsGuessCorrect tests", () => {
 
     const gameData = Director.get().createGameForPlayer("Player1");
     const createdGame = GameManager.get().getByToken(TokenManager.get().getFromString(gameData.get("gameToken")));
+    if (createdGame === undefined) {
+      chai.expect(true).to.be.false;
+      return;
+    }
 
     // Add second players to game
     Director.get().joinGameForPlayer(createdGame.getToken(),"Player2");

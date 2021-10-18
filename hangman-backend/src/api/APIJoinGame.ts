@@ -13,7 +13,12 @@ export function apiJoinGame(gameToken: string, playerName: string): string | und
     return undefined; // No game on given token
   }
 
-  if (!GameManager.get().getByToken(resolvedGameToken).playerCanJoin()) {
+  const resolvedGame = GameManager.get().getByToken(resolvedGameToken);
+  if (resolvedGame === undefined) {
+    return "failed";
+  }
+
+  if (!resolvedGame.playerCanJoin()) {
     getLogger().debug("[APIJoinGame] Resolved game is not joinable");
     return undefined; // Game already started
   }

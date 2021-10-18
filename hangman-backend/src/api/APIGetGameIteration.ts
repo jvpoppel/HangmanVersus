@@ -7,15 +7,20 @@ import {GameManager} from "../manager/GameManager";
 
 export function apiGetGameIteration(gameToken: string, playerToken: string): string {
   const resolvedPlayer: PlayerToken | NullToken = TokenManager.get().getFromString(playerToken);
-  const resolvedGame: GameToken | NullToken = TokenManager.get().getFromString(gameToken);
+  const resolvedGameToken: GameToken | NullToken = TokenManager.get().getFromString(gameToken);
 
-  if (resolvedPlayer.isNullToken() || resolvedGame.isNullToken()) {
+  if (resolvedPlayer.isNullToken() || resolvedGameToken.isNullToken()) {
     return "-1";
   }
-  const result: GameToken | undefined = Director.get().checkIfPlayerInGame(<PlayerToken> resolvedPlayer, resolvedGame);
+  const result: GameToken | undefined = Director.get().checkIfPlayerInGame(<PlayerToken> resolvedPlayer, resolvedGameToken);
+
   if (result == undefined) {
     return "-1";
   } else {
-    return GameManager.get().getByToken(result).getIteration() + "";
+    const resolvedGame = GameManager.get().getByToken(resolvedGameToken);
+    if (resolvedGame === undefined) {
+      return "failed";
+    }
+    return resolvedGame.getIteration() + "";
   }
 }

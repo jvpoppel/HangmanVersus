@@ -24,9 +24,13 @@ export class GameData {
    * @returns "failed" iff game and/or playertokens are not valid. Else, stringified version of game data.
    */
   public static convert(gameToken: GameToken, playerToken: PlayerToken): any {
-    const game: Game = GameManager.get().getByToken(gameToken);
+    const game: Game | undefined = GameManager.get().getByToken(gameToken);
     const player: Player = PlayerManager.get().getByToken(playerToken);
     const playersInGame: Set<PlayerToken> | undefined = Director.get().getPlayersInGame(gameToken);
+
+    if (game === undefined) {
+      return "failed";
+    }
 
     if (Director.get().checkIfPlayerInGame(playerToken, gameToken) === undefined) {
       return "failed";
