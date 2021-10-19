@@ -28,6 +28,7 @@ export class Game {
   private players: Player[];
   private substate: SubState;
   private winningRole: GameRole;
+  private maxNumberOfIncorrectGuesses: number;
 
   constructor() {
     this.state = GameState.OPEN_WAITFORPLAYERS;
@@ -37,6 +38,7 @@ export class Game {
     this.players = [];
     this.substate = SubState.PLAYERS_CHOOSING_WORDS;
     this.winningRole = GameRole.UNDECIDED;
+    this.maxNumberOfIncorrectGuesses = 6;
   }
 
   /* Below method should only be called from Director */
@@ -79,6 +81,10 @@ export class Game {
     return this.iteration;
   }
 
+  public getMaxNumberOfIncorrectGuesses(): number {
+    return this.maxNumberOfIncorrectGuesses;
+  }
+
   public getToken(): GameToken {
     return this.token;
   }
@@ -99,6 +105,11 @@ export class Game {
   public setHost(host: Player): Game {
     this.host = host;
     this.increaseIteration();
+    return this;
+  }
+
+  public setNumberOfIncorrectGuesses(numberOfIncorrectGuesses: number) {
+    this.maxNumberOfIncorrectGuesses = numberOfIncorrectGuesses;
     return this;
   }
 

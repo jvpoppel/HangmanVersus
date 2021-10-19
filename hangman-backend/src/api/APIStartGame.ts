@@ -7,7 +7,7 @@ import {getLogger} from "../endpoint";
 import {PlayerToken} from "../model/PlayerToken";
 import {Director} from "../manager/Director";
 
-export function apiStartGame(supposedHost: string, givenToken: string): string {
+export function apiStartGame(supposedHost: string, givenToken: string, numberOfIncorrectGuesses: number): string {
 
   const gameToken: Token = TokenManager.get().getFromString(givenToken);
   const playerToken: Token = TokenManager.get().getFromString(supposedHost);
@@ -43,7 +43,7 @@ export function apiStartGame(supposedHost: string, givenToken: string): string {
     return "failed"; // Game not started, it needs exactly two players.
   }
 
-  const gameStarted: boolean | undefined = Director.get().startGame(gameToken);
+  const gameStarted: boolean | undefined = Director.get().startGame(gameToken, numberOfIncorrectGuesses);
   if (gameStarted === undefined) {
     getLogger().debug("[APIStartGame] Game " + givenToken + " could not be started.");
     return "failed"; // Game not started, might be already in progress

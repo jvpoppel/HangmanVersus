@@ -73,7 +73,9 @@ export class Main {
    */
   public async performStartGameApi(): Promise<void> {
 
-    await StartGameAPI.send(LocalStorage.gameToken(), LocalStorage.playerToken(), LocalStorage.uuid());
+    const incorrectGuesses = (<HTMLInputElement> WebElements.HOST_OPTION_MAXINCORRECT()).valueAsNumber;
+
+    await StartGameAPI.send(LocalStorage.gameToken(), LocalStorage.playerToken(), LocalStorage.uuid(), incorrectGuesses);
   }
 
   public async performDisconnectFromGameApi(): Promise<void> {

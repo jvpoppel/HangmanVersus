@@ -28,6 +28,9 @@ export class WebElements {
   public static WINNER_ROW(): HTMLElement { return document.getElementById("row-win");}
   public static WINNER_VALUE(): HTMLElement { return document.getElementById("winningRole");}
 
+  public static HOST_OPTIONS(): HTMLElement { return document.getElementById("row-host-options");}
+  public static HOST_OPTION_MAXINCORRECT(): HTMLElement { return document.getElementById("nrIncorrectGuesses"); }
+
   public static WORD_SELECTION_SECTION(): HTMLElement { return document.getElementById("row-choose-word")}
   public static WORD_INPUT(): HTMLElement { return document.getElementById("wordInput")}
   public static WORD_SUBMIT(): HTMLElement { return document.getElementById("wordSubmit")}

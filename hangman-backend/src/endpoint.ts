@@ -14,7 +14,6 @@ import {validateParams} from "./api/validators/ParamsValidator";
 import {Validation} from "./api/Validation";
 import {AuthResponse} from "./api/responses/AuthResponse";
 import {AuthValidator} from "./api/validators/AuthValidator";
-import {InternalAPIReturns} from "./api/responses/InternalAPIReturns";
 import {apiChooseWord} from "./api/APIChooseWord";
 import {apiGuess} from "./api/APIGuess";
 
@@ -281,7 +280,7 @@ app.put("/api/game/:gametoken/:playertoken/disconnect", function(req, res) {
  */
 app.put("/api/game/:gametoken/start", function(req, res) {
   logger.info("[EXPRESS] Player " + req.body.host + " attempts to start game " + req.params.gametoken);
-  const paramsValidation: Validation | undefined = validateParams(req.params.gametoken, req.body.uuid, req.body.host).body();
+  const paramsValidation: Validation | undefined = validateParams(req.params.gametoken, req.body.uuid, req.body.host, req.body.numberOfIncorrectGuesses).body();
   if (paramsValidation !== undefined) {
     res.status(paramsValidation.status).send(JSON.stringify(paramsValidation));
     return;
@@ -293,7 +292,7 @@ app.put("/api/game/:gametoken/start", function(req, res) {
     return;
   }
 
-  const response: string = apiStartGame(req.body.host, req.params.gametoken);
+  const response: string = apiStartGame(req.body.host, req.params.gametoken, req.body.numberOfIncorrectGuesses);
   if (response === "unauthorized") {
     res.status(401).send(JSON.stringify({"status": "failed"}));
   } else if (response === "failed") {

@@ -58,8 +58,11 @@ export class UpdateWithGameData {
         }
         playerIndex++;
       }
-
+      WebElements.HOST_OPTIONS().style.display = "";
+    } else {
+      WebElements.HOST_OPTIONS().style.display = "none";
     }
+
     // If game started; Narrator? column is not needed anymore.
     DisplayManager.ShowCorrectPlayerList(playerIsHost && !data.started);
 

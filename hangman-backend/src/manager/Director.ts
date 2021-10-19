@@ -148,7 +148,7 @@ export class Director {
     return true;
   }
 
-  public startGame(gameToken: GameToken): boolean | undefined {
+  public startGame(gameToken: GameToken, numberOfIncorrectGuesses: number): boolean | undefined {
     const involvedGame = GameManager.get().getByToken(gameToken);
     if (involvedGame === undefined) {
       return undefined;
@@ -160,6 +160,7 @@ export class Director {
       return undefined;
     }
     this.divideRolesForGame(gameToken);
+    involvedGame.setNumberOfIncorrectGuesses(numberOfIncorrectGuesses);
     return involvedGame.start();
   }
 
@@ -245,8 +246,8 @@ export class Director {
       } else {
         game.finish(GameRole.PLAYER_TWO);
       }
-    } else if (PlayerManager.get().getByToken(playerToken).getIncorrectGuesses() > 5) {
-      // More than 6 incorrect guesses; other player wins!
+    } else if (PlayerManager.get().getByToken(playerToken).getIncorrectGuesses()>= game.getMaxNumberOfIncorrectGuesses()) {
+      // More than defined incorrect guesses; other player wins!
       if (game.getHost() === playerToken.getToken()) {
         // Player one has too many incorrect guesses, player two wins.
         game.finish(GameRole.PLAYER_TWO);
